@@ -10,25 +10,22 @@ import org.springframework.stereotype.Component;
 import telran.java58.accounting.dao.UserAccountRepository;
 import telran.java58.accounting.model.Role;
 import telran.java58.accounting.model.UserAccount;
+import telran.java58.security.model.User;
 
 import java.io.IOException;
 
 @Component
 @Order(40)
-@RequiredArgsConstructor
 public class DeleteUserFilter implements Filter {
-    private final UserAccountRepository repository;
-
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         if (checkEndPoint(request.getMethod(), request.getServletPath())) {
-            String login = request.getUserPrincipal().getName();
+            User user = (User) request.getUserPrincipal();
             String[] parts = request.getServletPath().split("/");
-            UserAccount user = repository.findById(login).orElseThrow(RuntimeException::new);
             String owner = parts[parts.length - 1];
-            if (!(user.getRoles().contains(Role.ADMINISTRATOR) || login.equalsIgnoreCase(owner))) {
+            if (!(user.getRoles().contains(Role.ADMINISTRATOR.name()) || user.getName().equalsIgnoreCase(owner))) {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return;
             }

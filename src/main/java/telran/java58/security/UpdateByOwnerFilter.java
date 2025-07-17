@@ -29,6 +29,11 @@ public class UpdateByOwnerFilter implements Filter {
     }
 
     private boolean checkEndPoint(String method, String servletPath) {
-        return HttpMethod.PUT.matches(method) && servletPath.matches("/account/user/\\w+");
+        return (
+                HttpMethod.PATCH.matches(method) && servletPath.matches("/account/user/\\w+")
+                || HttpMethod.POST.matches(method) && servletPath.matches("/forum/post/\\w+")
+                || HttpMethod.PATCH.matches(method) && servletPath.matches("/forum/post/\\w+/comment/\\w+")
+
+        );
     }
 }
