@@ -1,9 +1,10 @@
 package telran.java58.accounting.service;
 
-import org.mindrot.jbcrypt.BCrypt;
+
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import telran.java58.accounting.dao.UserAccountRepository;
 import telran.java58.accounting.dto.RolesDto;
@@ -21,6 +22,7 @@ import telran.java58.accounting.model.UserAccount;
 public class UserAccountServiceImpl implements UserAccountService, CommandLineRunner {
     private final UserAccountRepository userAccountRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto register(UserRegisterDto userRegisterDto) {
@@ -29,7 +31,7 @@ public class UserAccountServiceImpl implements UserAccountService, CommandLineRu
         }
         UserAccount userAccount = modelMapper.map(userRegisterDto, UserAccount.class);
         userAccount.addRole("USER");
-        String password = BCrypt.hashpw(userRegisterDto.getPassword(), BCrypt.gensalt());
+        String password = passwordEncoder.encode(userRegisterDto.getPassword());
         userAccount.setPassword(password);
         userAccountRepository.save(userAccount);
         return modelMapper.map(userAccount, UserDto.class);
@@ -80,7 +82,7 @@ public class UserAccountServiceImpl implements UserAccountService, CommandLineRu
     @Override
     public void changePassword(String login, String newPassword) {
         UserAccount userAccount = userAccountRepository.findById(login).orElseThrow(UserNotFoundException::new);
-        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        String hashedPassword = passwordEncoder.encode(newPassword);
         userAccount.setPassword(hashedPassword);
         userAccountRepository.save(userAccount);
     }
@@ -90,7 +92,7 @@ public class UserAccountServiceImpl implements UserAccountService, CommandLineRu
         if (!userAccountRepository.existsById("admin")) {
             UserAccount admin = UserAccount.builder()
                     .login("admin")
-                    .password(BCrypt.hashpw("admin", BCrypt.gensalt()))
+                    .password(passwordEncoder.encode("admin"))
                     .firstName("Admin")
                     .lastName("Admin")
                     .role(Role.USER)
