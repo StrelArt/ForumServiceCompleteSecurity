@@ -1,6 +1,7 @@
 package telran.java58.post.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import telran.java58.post.dao.PostRepository;
@@ -10,6 +11,7 @@ import telran.java58.post.dto.PostDto;
 import telran.java58.post.dto.exception.PostNotFoundException;
 import telran.java58.post.model.Comment;
 import telran.java58.post.model.Post;
+import telran.java58.post.service.logging.PostLogger;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +38,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @PostLogger
     public void addLike(String id) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         post.addLike();
@@ -43,6 +46,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @PostLogger
     public PostDto updatePost(String id, NewPostDto newPostDto) {
         Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
         String title = newPostDto.getTitle();
