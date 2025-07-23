@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +25,9 @@ public class UserAccount {
     private String lastName;
     @Singular
     private Set<Role> roles = new HashSet<>();
+    @Setter
+    @Getter
+    private LocalDateTime passwordChangeDate;
 
     public boolean addRole(String role) {
         return roles.add(Role.valueOf(role.toUpperCase()));
@@ -32,4 +36,6 @@ public class UserAccount {
     public boolean removeRole(String role) {
         return roles.remove(Role.valueOf(role.toUpperCase()));
     }
+
+
 }

@@ -17,6 +17,8 @@ import telran.java58.accounting.dto.exception.UserNotFoundException;
 import telran.java58.accounting.model.Role;
 import telran.java58.accounting.model.UserAccount;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserAccountServiceImpl implements UserAccountService, CommandLineRunner {
@@ -33,6 +35,7 @@ public class UserAccountServiceImpl implements UserAccountService, CommandLineRu
         userAccount.addRole("USER");
         String password = passwordEncoder.encode(userRegisterDto.getPassword());
         userAccount.setPassword(password);
+        userAccount.setPasswordChangeDate(LocalDateTime.now());
         userAccountRepository.save(userAccount);
         return modelMapper.map(userAccount, UserDto.class);
     }
@@ -84,6 +87,7 @@ public class UserAccountServiceImpl implements UserAccountService, CommandLineRu
         UserAccount userAccount = userAccountRepository.findById(login).orElseThrow(UserNotFoundException::new);
         String hashedPassword = passwordEncoder.encode(newPassword);
         userAccount.setPassword(hashedPassword);
+        userAccount.setPasswordChangeDate(LocalDateTime.now());
         userAccountRepository.save(userAccount);
     }
 
@@ -99,6 +103,7 @@ public class UserAccountServiceImpl implements UserAccountService, CommandLineRu
                     .role(Role.MODERATOR)
                     .role(Role.ADMINISTRATOR)
                     .build();
+            admin.setPasswordChangeDate(LocalDateTime.now());
             userAccountRepository.save(admin);
         }
     }
